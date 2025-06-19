@@ -71,97 +71,110 @@
 //   res.status(200).json(deleteUsers);
 // };
 
-
-
 ///--------------------------------------------MongoDb-------------------------------------------------
 
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
 
-import { getAllUsersService, getUserByIdService, createUserService, updateUserService, deleteUserService } from "../models/mongodb-models/user/userServices";
-// import { request } from "http";
+import {
+  getAllUsersService,
+  getUserByIdService,
+  createUserService,
+  updateUserService,
+  deleteUserService,
+} from "../../models/mongodb-models/user/userServices";
+import { hashPassword } from "../../utils/bcrypt";
 // import { categoryModel } from "../sql-models/category.sql-models";
 
-function validateUser(body:any){
-  if( typeof body.user_name !== "string" || !body.user_name.trim() ){
-       return "name is required"
+function validateUser(body: any) {
+  if (typeof body.user_name !== "string" || !body.user_name.trim()) {
+    return "name is required";
   }
-  if( typeof body.user_email !== "string" || !body.user_email.trim()){
-    return "invalid email"
+  if (typeof body.user_email !== "string" || !body.user_email.trim()) {
+    return "invalid email";
   }
-    if(!body.user_password.trim()){
-    return "invalid password"
+  if (!body.user_password.trim()) {
+    return "invalid password";
   }
   return null;
-
 }
 
-export const getAllUser= async(req:Request, res:Response)=>{
-         const allUsers= await getAllUsersService();
-         if(!allUsers){
-              res.status(404).json({message : "No users found"});
-         }
-         res.json(allUsers)
-}
+export const getAllUser = async (req: Request, res: Response) => {
+  const allUsers = await getAllUsersService();
+  if (!allUsers) {
+    res.status(404).json({ message: "No users found" });
+  }
+  res.json(allUsers);
+};
 
-export const getUserById= async(req:Request, res:Response)=>{
-  const id=req.params.id;
+export const getUserById = async (req: Request, res: Response) => {
+  const id = req.params.id;
   console.log("id=", id);
-  const oneUser=await getUserByIdService(id);
-  if(!oneUser){
+  const oneUser = await getUserByIdService(id);
+  if (!oneUser) {
     res.status(404).json("no user found");
   }
   res.json(oneUser);
+};
 
-}
+export const createUser = async (req: Request, res: Response) => {
+  const { user_name, user_email, user_password } = req.body;
+  const error = validateUser({ user_name, user_email, user_password });
+  try {
+    const hashedPassword = await hashPassword(user_password);
+    if (error) {
+      res.status(400).json({ message: error });
+      return;
+    }
 
-export const createUser= async(req:Request, res:Response)=>{
-  const error= validateUser(req.body);
-  if(error){
-    res.status(400).json({ message: error });
-    return;
-  }
+    const createdUser = await createUserService({
+      user_name: user_name,
+      user_email: user_email,
+      user_password: hashedPassword,
+    });
+    console.log(createdUser);
 
-  const createdUser= await createUserService(req.body);
-  console.log(createdUser);
-  try{
-    res.status(201).json(createdUser)
-  }
-  catch (err){
+    res.status(201).json("created user" + createdUser);
+  } catch (err) {
     res.send(err);
   }
+  return;
+};
 
-}
-
-
-export const updateUser = async(req:Request , res:Response)=>{
-     const id = req.params.id;
-     const { user_name, user_email, user_password } = req.body;
-     const updatedUser = await updateUserService({ id, name: user_name, email: user_email, password: user_password });
-     if(!updatedUser){
-       res.status(404).json({ message: "user not found" });
+export const updateUser = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const { user_name, user_email, user_password } = req.body;
+  const updatedUser = await updateUserService({
+    id,
+    name: user_name,
+    email: user_email,
+    password: user_password,
+  });
+  if (!updatedUser) {
+    res.status(404).json({ message: "user not found" });
     return;
-     }
-     const error= validateUser({...updatedUser, ...req.body})
-      if (error) {
+  }
+  const error = validateUser({ ...updatedUser, ...req.body });
+  if (error) {
     res.status(400).json({ message: error });
     return;
   }
-  try{
-    const getUserById= await getUserByIdService(id);
+  try {
+    const getUserById = await getUserByIdService(id);
     res.json(getUserById);
-  }
-  catch(error){
+  } catch (error) {
     res.send(error);
   }
-}    
+  return;
+};
 
-export const deleteUserById=async (req:Request, res:Response)=>{
-  const id= req.params.id;
-   const deletedUser=deleteUserService(id);
-    if (!deletedUser) {
+export const deleteUserById = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const deletedUser = deleteUserService(id);
+  if (!deletedUser) {
     res.status(404).json({ message: "User not found" });
     return;
   }
-    res.status(200).send({ message: "User deleted successfully" });
-
-}
+  res.status(200).send({ message: "User deleted successfully" });
+  return;
+};

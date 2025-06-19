@@ -31,14 +31,16 @@
 
 import  express  from "express";
 import { createProduct, getProduct, getProductById ,updateProductById,deleteProductById} from "../controller/productController";
+import { authMiddleware } from '../utils/auth-middleware';
+
 
 const productRouter= express.Router();
 
-productRouter.post('/', createProduct);
-productRouter.get('/', getProduct);
-productRouter.get('/:id', getProductById);
-productRouter.put('/:id', updateProductById);
-productRouter.delete('/:id', deleteProductById);
+productRouter.post('/', authMiddleware,createProduct);
+productRouter.get('/',authMiddleware, getProduct);
+productRouter.get('/:id',authMiddleware, getProductById);
+productRouter.put('/:id',authMiddleware, updateProductById);
+productRouter.delete('/:id',authMiddleware, deleteProductById);
 
 
 export {productRouter} 

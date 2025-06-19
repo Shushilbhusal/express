@@ -17,6 +17,11 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    user_role:{
+        type: String,
+        enum: ['admin', 'user'],
+        required: false
+    },
     created_at: {
         type: Date,
         default: Date.now,
@@ -28,6 +33,7 @@ const userSchema = new Schema({
         required: false
     }
 });
+
 
 const User= mongoose.model('User', userSchema);
 

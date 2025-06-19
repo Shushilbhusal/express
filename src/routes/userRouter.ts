@@ -18,17 +18,3 @@
 
 
 
-
-import express from 'express'
-import {
-    getAllUser, getUserById, createUser, updateUser, deleteUserById
-} from '../controller/userController'
-
-const userRouter= express.Router();
-userRouter.get("/", getAllUser);
-userRouter.get('/:id', getUserById);
-userRouter.post('/', createUser);
-userRouter.delete('/:id', deleteUserById);
-userRouter.put('/:id', updateUser);
-
-export {userRouter};

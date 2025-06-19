@@ -1,6 +1,14 @@
 import mongoose, { Schema } from "mongoose";
 
-const productSchema = new Schema(
+export interface IProduct extends Document {
+  product_name: string;
+  description: string;
+  price: number;
+  created_at: Date;
+  updated_at: Date;
+  category: Schema.Types.ObjectId;
+}
+const productSchema = new Schema<IProduct>(
     {
       product_name :{
         type: String,
@@ -17,10 +25,12 @@ const productSchema = new Schema(
       created_at:{
         type: Date,
         default: Date.now,
+        required: true
       } ,
       updated_at:{
         type: Date,
-       
+        default: Date.now,
+        required: false
       
       } ,
       category: {
@@ -31,6 +41,9 @@ const productSchema = new Schema(
     }
 )
 
-const Product = mongoose.model("Product", productSchema);
+// const Product = mongoose.model("Product", productSchema);
 
-export default Product;
+// export default Product;
+
+export default mongoose.models.Product || 
+mongoose.model<IProduct>("Product", productSchema);

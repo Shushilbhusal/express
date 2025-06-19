@@ -1,9 +1,20 @@
-// import Order from './orders.mongodb-model'
-// import OrderProduct from '../orderProduct/orderProduct.mongodb-model'
-// export const creteOrderService= async (data:{user_id:string, product_id:[], total_amount:Number })=>{
-//     const createdOrder= new Order(data);
-//     const createdOrderProduct= new OrderProduct(data);
-//     return await createdOrder.save();
-//     return await createdOrderProduct .save();
-// }
-// export 
+import OrderModel, { IOrder } from "./orders.mongodb-model";
+
+export const MongoOrderService = {
+  async getAll() {
+    return OrderModel.find();
+  },
+  async getById(id: string) {
+    return OrderModel.findById(id);
+  },
+  async create(order: Omit<IOrder, "_id" | "created_at">) {
+    return OrderModel.create(order);
+  },
+  async update(id: string, order: Partial<IOrder>) {
+    return OrderModel.findByIdAndUpdate(id, order, { new: true });
+  },
+  async delete(id: string) {
+    const res = await OrderModel.findByIdAndDelete(id);
+    return !!res;
+  },
+};

@@ -13,7 +13,7 @@ const validateProduct=(data:any)=>{
   if(typeof data.product_name !== 'string' || !data.product_name.trim() ){
     return "product is required"
   }
-  if(typeof data.price !=='string'){
+  if(typeof data.price !=='number'){
     return "price should be in number"
   }
   if(typeof data.description !=='string' || !data.description.trim()){

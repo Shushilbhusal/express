@@ -16,8 +16,16 @@ export const getProductByIdService=async(id:string)=>{
 
 
 export const updateProductService= async (data:{product_id:string, product_name:string, price:Number})=>{
-     const updatedData= await Product.updateOne({_id:data.product_id},{$set:{product_name:data.product_name, price:data.price}});
-     return updatedData;
+    //  if( !data.product_name || !data.price) {
+    //  const updatedData= await Product.updateOne({_id:data.product_id},{$set:{product_name:data.product_name, price:data.price}});
+    //  return updatedData;
+
+        //  }
+        return  Product.findByIdAndUpdate(
+          data.product_id,
+          { product_name: data.product_name, price: data.price },
+          { new: true } // This option returns the modified document rather than the original
+        );
 }
 
 

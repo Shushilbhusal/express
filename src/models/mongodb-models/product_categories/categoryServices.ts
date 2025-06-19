@@ -15,11 +15,14 @@ async function getCategoryByIdService(id: string) {
 }
 
 async function updateCategoryByIdService(data: { id: string; name: string }) {
+  if (!data.id || !data.name) {
+  
   const category = await Category.updateOne(
     { _id: data.id },
     { $set: { name: data.name }}
   );
   return category;
+}
 }
 
 async function deleteCategoryByIdService(id: string) {
